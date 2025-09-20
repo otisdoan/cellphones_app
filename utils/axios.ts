@@ -1,5 +1,3 @@
-/* eslint-disable import/no-unresolved */
-import { DOMAIN_BACKEND, GOOGLE_CLIENT_ID } from "@env";
 import axios, {
   AxiosError,
   type AxiosRequestConfig,
@@ -7,7 +5,7 @@ import axios, {
 } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: GOOGLE_CLIENT_ID,
+  baseURL: process.env.GOOGLE_CLIENT_ID,
   withCredentials: true,
 });
 
@@ -32,7 +30,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       try {
         await axios.post<{ access_token: string }>(
-          `${DOMAIN_BACKEND}/auth/refresh-token`,
+          `${process.env.DOMAIN_BACKEND}/auth/refresh-token`,
           {},
           { withCredentials: true }
         );

@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <>
       <View>
-        <Text onPress={() => router.navigate("/")}>Login</Text>
+        <Text onPress={() => router.navigate("/(auth)/login")}>Login</Text>
       </View>
     </>
   );
