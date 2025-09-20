@@ -1,0 +1,31 @@
+export const API_URL = {
+  LOGIN: "/auth/login",
+  REGISTER: "/auth/register",
+  GOOGLE: "/auth/google",
+  CATEGORY: "/category",
+  OTHER_BRAND: {
+    GET_ALL_NAME: "/brand/name",
+  },
+  OTHER_CATEGORY: {
+    GET_ALL_NAME: "/category/name",
+    CATEGORY_MOBILE: "category/category-mobile",
+    CATEGORY_TABLET_MOBILE: "category/category-tablet-mobile",
+  },
+  PRODUCT: "/products",
+  OTHER_PRODUCT: {
+    GET_ALL_NAME: "/products/name",
+    GET_BY_SLUG: "/products",
+  },
+  BRAND: "/brand",
+  PRODUCT_IMAGES: "/product-images",
+  MENU_SMARTPHONE: "/menu",
+  MENU_LAPTOP: "/menu/laptop",
+  PRODUCT_VARIANT_BY_ID: "/product-variant",
+  PRODUCT_CAPACITY: "/product-variant/capacity",
+  PRODUCT_VARIANT_BY_CAPACITY: "/product-variant/by-capacity",
+  PRODUCT_ATTRIBUTE: "/product-attribute",
+  USER: "/users",
+  ORDER: "/orders",
+  ORDER_ITEMS: "/order-items",
+  CART_ITEM: "/cart-items",
+};
