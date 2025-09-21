@@ -5,20 +5,20 @@ import axios, {
 } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.GOOGLE_CLIENT_ID,
+  baseURL: process.env.DOMAIN_BACKEND,
   withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const access_token = localStorage.getItem("access_token");
-    if (access_token) {
-      config.headers?.set("Authorization", `Bearer ${access_token}`);
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// axiosInstance.interceptors.request.use(
+//   (config) => {
+//     const access_token = localStorage.getItem("access_token");
+//     if (access_token) {
+//       config.headers?.set("Authorization", `Bearer ${access_token}`);
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse): AxiosResponse => response,

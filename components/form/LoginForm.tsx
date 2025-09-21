@@ -1,6 +1,7 @@
 import { LoginFormType } from "@/types/type";
+import { authApi } from "@/utils/api";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
@@ -21,10 +22,21 @@ export default function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormType>({
     resolver: yupResolver(loginSchema),
+    mode: "onBlur",
+    reValidateMode: "onBlur",
   });
 
   const onSubmit = async (data: LoginFormType) => {
-    console.log(data);
+    try {
+      const result = await authApi.login(data);
+      if (result) {
+        setTimeout(() => {
+          router.replace("/");
+        }, 2000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

@@ -1,10 +1,11 @@
+import { TokenResponse } from "expo-auth-session/build/TokenRequest";
 import { API_URL } from "../../constants/API_URL";
 import type {
+  LoginFormType,
   LoginResponse,
+  RegisterFormType,
   RegisterResponse,
   UserProps,
-  LoginFormType,
-  RegisterFormType,
 } from "../../types/api";
 import axiosInstance from "../axios";
 
@@ -24,7 +25,7 @@ export const authApi = {
     );
     return response.data;
   },
-  loginByGoogle: async (token: string | undefined) => {
+  loginByGoogle: async (token: TokenResponse) => {
     const response = await axiosInstance.post<LoginResponse<UserProps>>(
       API_URL.GOOGLE,
       {
