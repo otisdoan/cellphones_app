@@ -32,10 +32,21 @@ export default function AuthLayout() {
         }}
       />
       <Stack.Screen
-        name="register"
+        name="register/index"
         options={{
-          title: "Đăng ký",
+          title: "",
           headerShown: true,
+          headerLeft: () => (
+            <View className="-ml-5">
+              <TouchableOpacity onPress={() => router.back()}>
+                <MaterialIcons
+                  name="keyboard-arrow-left"
+                  size={40}
+                  color="black"
+                />
+              </TouchableOpacity>
+            </View>
+          ),
         }}
       />
     </Stack>

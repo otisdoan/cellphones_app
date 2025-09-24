@@ -60,14 +60,14 @@ export default function LoginForm() {
               onChangeText={onChange}
               value={value}
             />
-            {errors.phone && (
-              <View className="-mt-4">
-                <HelperText type="error">{errors.phone.message}</HelperText>
-              </View>
-            )}
           </>
         )}
       />
+      {errors.phone && (
+        <View className="-mt-4">
+          <HelperText type="error">{errors.phone.message}</HelperText>
+        </View>
+      )}
       <Controller
         control={control}
         name="password_login"
@@ -87,16 +87,14 @@ export default function LoginForm() {
               onChangeText={onChange}
               value={value}
             />
-            {errors.password_login && (
-              <View className="-mt-4">
-                <HelperText type="error">
-                  {errors.password_login.message}
-                </HelperText>
-              </View>
-            )}
           </>
         )}
       />
+      {errors.password_login && (
+        <View className="-mt-4">
+          <HelperText type="error">{errors.password_login.message}</HelperText>
+        </View>
+      )}
 
       <View className="flex items-end mb-5">
         <Link href="/(tabs)">
@@ -116,7 +114,7 @@ export default function LoginForm() {
 
       <View className="flex flex-row justify-center gap-x-4 mt-5">
         <Text>Bạn chưa có tài khoản?</Text>
-        <Link href="/(tabs)">
+        <Link href="/(auth)/register">
           <Text className="text-[#d70119]">Đăng ký ngay</Text>
         </Link>
       </View>

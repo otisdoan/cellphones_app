@@ -19,11 +19,11 @@ export interface LoginFormType {
 
 export interface RegisterFormType {
   full_name: string;
-  date_of_birth: string;
+  date_of_birth: Date;
   phone: string;
   email: string;
   password_hash: string;
-  confirm_password?: string;
+  confirm_password: string;
 }
 
 // User types
