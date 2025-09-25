@@ -1,8 +1,11 @@
 import { RegisterFormType } from "@/types/api";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Link } from "expo-router";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { View } from "react-native";
-import { Button, HelperText, TextInput } from "react-native-paper";
+import { Text, View } from "react-native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { Button, Checkbox, HelperText, TextInput } from "react-native-paper";
 import * as yup from "yup";
 
 const registerSchema = yup.object({
@@ -46,6 +49,9 @@ export default function RegisterForm() {
   });
 
   const onSubmit = (data: RegisterFormType) => console.log(data);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [checkedTop, setCheckedTop] = useState(false);
+  const [checkedBottom, setCheckedBottom] = useState(false);
 
   return (
     <>
@@ -75,15 +81,33 @@ export default function RegisterForm() {
           control={control}
           name="date_of_birth"
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Chọn ngày sinh"
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value ? value.toString() : ""}
-              mode="outlined"
-              label={"Ngày sinh (*)"}
-              outlineStyle={{ borderColor: "#e0e1e2" }}
-            />
+            <>
+              <TextInput
+                placeholder="Chọn ngày sinh"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value ? new Date(value).toLocaleDateString("vi-VN") : ""}
+                mode="outlined"
+                label={"Ngày sinh (*)"}
+                outlineStyle={{ borderColor: "#e0e1e2" }}
+                right={
+                  <TextInput.Icon
+                    icon="calendar"
+                    onPress={() => setDatePickerVisibility(true)}
+                  />
+                }
+              />
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="date"
+                maximumDate={new Date()}
+                onConfirm={(date) => {
+                  onChange(date);
+                  setDatePickerVisibility(false);
+                }}
+                onCancel={() => setDatePickerVisibility(false)}
+              />
+            </>
           )}
         />
         {errors.date_of_birth && (
@@ -176,6 +200,32 @@ export default function RegisterForm() {
             </HelperText>
           </View>
         )}
+
+        <View className="flex flex-row items-center">
+          <Checkbox.Android
+            status={checkedTop ? "checked" : "unchecked"}
+            onPress={() => setCheckedTop(!checkedTop)}
+            uncheckedColor="#adb0ba"
+            color="#d70119"
+          />
+          <Text className="opacity-65 text-sm">
+            Tôi đồng ý với các điều khoản bảo mật cá nhân
+          </Text>
+        </View>
+
+        <View className="flex flex-row items-center -mt-5">
+          <Checkbox.Android
+            status={checkedBottom ? "checked" : "unchecked"}
+            onPress={() => setCheckedBottom(!checkedBottom)}
+            uncheckedColor="#adb0ba"
+            color="#d70119"
+          />
+          <Text className="opacity-65 text-sm">
+            Tôi là Học sinh - sinh viên{"\n"}
+            (Xác nhận để được ưu đãi)
+          </Text>
+        </View>
+
         <View className="mt-4">
           <Button
             mode="contained"
@@ -186,6 +236,13 @@ export default function RegisterForm() {
           >
             Đăng ký
           </Button>
+        </View>
+
+        <View className="flex flex-row gap-x-3 justify-center mt-7 mb-4">
+          <Text>Bạn đã có tài khoản?</Text>
+          <Link href="/login" className="">
+            <Text className="text-[#d70119]">Đăng nhập ngay</Text>
+          </Link>
         </View>
       </View>
     </>
