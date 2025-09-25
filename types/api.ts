@@ -19,7 +19,7 @@ export interface LoginFormType {
 
 export interface RegisterFormType {
   full_name: string;
-  date_of_birth: Date;
+  date_of_birth: string;
   phone: string;
   email: string;
   password_hash: string;

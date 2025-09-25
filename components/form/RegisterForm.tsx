@@ -1,6 +1,8 @@
 import { RegisterFormType } from "@/types/api";
+import { authApi } from "@/utils/api";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "expo-router";
+import dayjs from "dayjs";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
@@ -18,10 +20,7 @@ const registerSchema = yup.object({
     .required("Full name is required")
     .min(2, "Full name must be at least 2 characters")
     .max(50, "Full name must be at most 50 characters"),
-  date_of_birth: yup
-    .date()
-    .required("Date of birth is required")
-    .max(new Date(), "Date of birth cannot be in the future"),
+  date_of_birth: yup.string().required("Date of birth is required"),
   email: yup
     .string()
     .email("Invalid email format")
@@ -48,10 +47,29 @@ export default function RegisterForm() {
     reValidateMode: "onBlur",
   });
 
-  const onSubmit = (data: RegisterFormType) => console.log(data);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [checkedTop, setCheckedTop] = useState(false);
   const [checkedBottom, setCheckedBottom] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const onSubmit = async (data: RegisterFormType) => {
+    try {
+      const result = await authApi.register({
+        ...data,
+        date_of_birth: dayjs(data.date_of_birth)
+          .format("YYYY-MM-DD")
+          .toString(),
+      });
+      if (result) {
+        setTimeout(() => {
+          router.replace("/login");
+        }, 2000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -68,6 +86,7 @@ export default function RegisterForm() {
               mode="outlined"
               label={"Họ và tên (*)"}
               outlineStyle={{ borderColor: "#e0e1e2" }}
+              autoCapitalize="none"
             />
           )}
         />
@@ -148,6 +167,7 @@ export default function RegisterForm() {
               mode="outlined"
               label={"Email (*)"}
               outlineStyle={{ borderColor: "#e0e1e2" }}
+              autoCapitalize="none"
             />
           )}
         />
@@ -168,7 +188,21 @@ export default function RegisterForm() {
               mode="outlined"
               label={"Mật khẩu (*)"}
               outlineStyle={{ borderColor: "#e0e1e2" }}
-              secureTextEntry
+              autoCapitalize="none"
+              secureTextEntry={!showPassword}
+              right={
+                showPassword ? (
+                  <TextInput.Icon
+                    icon="eye"
+                    onPress={() => setShowPassword(false)}
+                  />
+                ) : (
+                  <TextInput.Icon
+                    icon="eye-off"
+                    onPress={() => setShowPassword(true)}
+                  />
+                )
+              }
             />
           )}
         />
@@ -189,7 +223,21 @@ export default function RegisterForm() {
               mode="outlined"
               label={"Xác nhận mật khẩu (*)"}
               outlineStyle={{ borderColor: "#e0e1e2" }}
-              secureTextEntry
+              autoCapitalize="none"
+              secureTextEntry={!showConfirmPassword}
+              right={
+                showConfirmPassword ? (
+                  <TextInput.Icon
+                    icon="eye"
+                    onPress={() => setShowConfirmPassword(false)}
+                  />
+                ) : (
+                  <TextInput.Icon
+                    icon="eye-off"
+                    onPress={() => setShowConfirmPassword(true)}
+                  />
+                )
+              }
             />
           )}
         />

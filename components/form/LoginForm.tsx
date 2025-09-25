@@ -2,6 +2,7 @@ import { LoginFormType } from "@/types/type";
 import { authApi } from "@/utils/api";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, router } from "expo-router";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
@@ -25,6 +26,8 @@ export default function LoginForm() {
     mode: "onBlur",
     reValidateMode: "onBlur",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: LoginFormType) => {
     try {
@@ -86,6 +89,21 @@ export default function LoginForm() {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              autoCapitalize="none"
+              secureTextEntry={!showPassword}
+              right={
+                showPassword ? (
+                  <TextInput.Icon
+                    icon="eye"
+                    onPress={() => setShowPassword(false)}
+                  />
+                ) : (
+                  <TextInput.Icon
+                    icon="eye-off"
+                    onPress={() => setShowPassword(true)}
+                  />
+                )
+              }
             />
           </>
         )}
