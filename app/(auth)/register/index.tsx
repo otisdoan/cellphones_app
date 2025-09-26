@@ -8,11 +8,12 @@ export default function Register() {
       <ScrollView className="flex-1 bg-white px-4">
         <SafeAreaView className="flex- gap-y-8">
           <View className="flex items-center ">
-            <Image
-              source={require("@/assets/chibi2.webp")}
-              className="object-contain w-20 h-40"
-              resizeMode="cover"
-            />
+            <View className="mt-10 mb-7 w-32 h-28">
+              <Image
+                source={require("@/assets/empty.f8088c4d.png")}
+                className="object-contain w-full h-full"
+              />
+            </View>
           </View>
           <Text className="font-medium text-3xl text-center">Đăng ký với</Text>
           <Pressable>

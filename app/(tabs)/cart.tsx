@@ -1,12 +1,11 @@
 import { Text, View } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function HomeScreen() {
+export default function CartScreen() {
   return (
     <SafeAreaView>
       <View>
-        <Text>Home Screen</Text>
+        <Text>Cart Screen</Text>
       </View>
     </SafeAreaView>
   );
