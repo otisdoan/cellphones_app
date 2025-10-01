@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 import "../global.css";
 
@@ -17,16 +17,16 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: true }} />
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
-        />
-      </Stack>
-      <StatusBar style="light" />
-    </ThemeProvider>
+    <PaperProvider>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="modal"
+            options={{ presentation: "modal", title: "Modal" }}
+          />
+        </Stack>
+      </ThemeProvider>
+    </PaperProvider>
   );
 }

@@ -1,13 +1,12 @@
-import { Text, View } from "react-native";
-
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar, Text, View } from "react-native";
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView>
+    <>
+      <StatusBar barStyle="light-content" />
       <View>
         <Text>Home Screen</Text>
       </View>
-    </SafeAreaView>
+    </>
   );
 }
