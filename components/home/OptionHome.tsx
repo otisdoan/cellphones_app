@@ -7,27 +7,27 @@ export default function OptionHome() {
   const data: { id: number; icon: ReactNode; title: string }[] = [
     {
       id: 1,
-      icon: <Ionicons name="diamond-outline" size={24} color="red" />,
+      icon: <Ionicons name="diamond-outline" size={24} color="black" />,
       title: "Hạng thành viên",
     },
     {
       id: 2,
-      icon: <MaterialIcons name="discount" size={24} color="red" />,
+      icon: <MaterialIcons name="discount" size={24} color="black" />,
       title: "Mã giảm giá",
     },
     {
       id: 3,
-      icon: <MaterialIcons name="list-alt" size={24} color="red" />,
+      icon: <MaterialIcons name="list-alt" size={24} color="black" />,
       title: "Lịch sử mua hàng",
     },
     {
       id: 4,
-      icon: <Ionicons name="school" size={24} color="red" />,
+      icon: <Ionicons name="school" size={24} color="black" />,
       title: "S-Student & S-Teacher",
     },
     {
       id: 5,
-      icon: <MaterialIcons name="event" size={24} color="red" />,
+      icon: <MaterialIcons name="event" size={24} color="black" />,
       title: "Event",
     },
   ];

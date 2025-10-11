@@ -1,3 +1,4 @@
+import { CarouselHome } from "@/components/home/CarouselHome";
 import { CategoryHome } from "@/components/home/CategoryHome";
 import OptionHome from "@/components/home/OptionHome";
 import { useFocusEffect } from "@react-navigation/native";
@@ -20,6 +21,7 @@ export default function HomeScreen() {
           <OptionHome />
         </View>
         <CategoryHome />
+        <CarouselHome />
       </ScrollView>
     </>
   );
