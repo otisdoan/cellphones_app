@@ -120,6 +120,15 @@ export default function TabLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "Cài đặt",
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="setting" size={24} color={color} />
+            ),
+          }}
+        />
       </Tabs>
     </>
   );

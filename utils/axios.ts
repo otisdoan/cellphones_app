@@ -3,10 +3,34 @@ import axios, {
   type AxiosRequestConfig,
   type AxiosResponse,
 } from "axios";
+import { Platform } from "react-native";
+
+const envURL =
+  process.env.EXPO_PUBLIC_DOMAIN_BACKEND ||
+  process.env.DOMAIN_BACKEND ||
+  // @ts-expect-error allow VITE_ during dev parity
+  process.env.VITE_DOMAIN_BACKEND ||
+  "";
+
+// Handle emulator/device localhost differences
+const localFallback = Platform.select({
+  ios: "http://localhost:8080",
+  android: "http://10.0.2.2:8080",
+  default: "http://127.0.0.1:8080",
+});
+
+const baseURL = envURL || localFallback!;
+
+// Log for quick diagnosis in dev
+if (__DEV__) {
+  // eslint-disable-next-line no-console
+  console.log("[axios] baseURL:", baseURL);
+}
 
 const axiosInstance = axios.create({
-  baseURL: process.env.DOMAIN_BACKEND,
-  withCredentials: true,
+  baseURL,
+  // Disable cookies by default; enable only if backend supports it for mobile
+  withCredentials: false,
 });
 
 // axiosInstance.interceptors.request.use(
@@ -30,7 +54,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       try {
         await axios.post<{ access_token: string }>(
-          `${process.env.DOMAIN_BACKEND}/auth/refresh-token`,
+          `${baseURL}/auth/refresh-token`,
           {},
           { withCredentials: true }
         );
