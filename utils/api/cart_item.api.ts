@@ -28,12 +28,10 @@ export const cartItemApi = {
     return response.data;
   },
   update: async (id: string, payload: Partial<CartItemProps>) => {
-    console.log('Calling cart update API:', `${API_URL.CART_ITEM}/${id}`, 'with payload:', payload);
     const response = await axiosInstance.patch<CartItemResponse<CartItemProps>>(
       `${API_URL.CART_ITEM}/${id}`,
       payload
     );
-    console.log('Cart update response:', response.data);
     return response.data;
   },
   delete: async (id: string) => {

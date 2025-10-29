@@ -12,26 +12,35 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useOrder } from "@/context/OrderContext";
-import ProductSelected from "@/components/checkout/ProductSelected";
-import InforCustomer from "@/components/checkout/InforCustomer";
-import InforReceive from "@/components/checkout/InforReceive";
-import OptionPayment from "@/components/checkout/OptionPayment";
+import TabInfor from "@/components/checkout/TabInfor";
+import TabPayment from "@/components/checkout/TabPayment";
 import { paymentApi } from "@/utils/api/payment.api";
 
 export default function PaymentInfoScreen() {
   const router = useRouter();
   const { orderItems, setOrderAddress, getTotalAmount } = useOrder();
   const [activeTab, setActiveTab] = useState<"info" | "payment">("info");
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "transfer" | "wallet" | "card">("cod");
+  const [paymentMethod, setPaymentMethod] = useState<
+    "cod" | "transfer" | "wallet" | "card"
+  >("cod");
   const [receiveFormData, setReceiveFormData] = useState<any>(null);
 
-  const handleContinue = () => {
-    if (!receiveFormData || !receiveFormData.name || !receiveFormData.phone || !receiveFormData.address) {
+  const handleFormDataChange = (data: any) => {
+    setReceiveFormData(data);
+  };
+
+  const handleContinue = async () => {
+    if (
+      !receiveFormData ||
+      !receiveFormData.name ||
+      !receiveFormData.phone ||
+      !receiveFormData.address
+    ) {
       Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin nhận hàng");
       return;
     }
-    
-    setOrderAddress(receiveFormData);
+
+    await setOrderAddress(receiveFormData);
     setActiveTab("payment");
   };
 
@@ -43,13 +52,13 @@ export default function PaymentInfoScreen() {
 
     try {
       const amount = getTotalAmount();
-      
+
       const result = await paymentApi.checkout({
         orderCode: Date.now(),
         amount: amount,
         description: `Thanh toán đơn hàng`,
-        returnUrl: `cellphones://payment-success`,
-        cancelUrl: `cellphones://payment-cancel`,
+        returnUrl: `${window.location?.origin || "cellphones://payment-success"}`,
+        cancelUrl: `${window.location?.origin || "cellphones://payment-cancel"}`,
       });
 
       if (result && result.checkoutUrl) {
@@ -107,7 +116,9 @@ export default function PaymentInfoScreen() {
           <Text
             style={[
               styles.tabText,
-              activeTab === "info" ? styles.tabTextActive : styles.tabTextInactive,
+              activeTab === "info"
+                ? styles.tabTextActive
+                : styles.tabTextInactive,
             ]}
           >
             1. THÔNG TIN
@@ -145,66 +156,12 @@ export default function PaymentInfoScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         {activeTab === "info" ? (
-          <>
-            <ProductSelected />
-            <InforCustomer />
-            <InforReceive onSubmit={setReceiveFormData} />
-          </>
+          <TabInfor onFormDataChange={handleFormDataChange} />
         ) : (
-          <>
-            <View style={styles.card}>
-              <Text style={styles.sectionTitle}>TÓM TẮT ĐƠN HÀNG</Text>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Số lượng sản phẩm</Text>
-                <Text style={styles.summaryValue}>
-                  {orderItems.reduce((sum, item) => sum + item.quantity, 0)}
-                </Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Tổng tiền hàng</Text>
-                <Text style={styles.summaryValue}>
-                  {getTotalAmount().toLocaleString("vi-VN")}đ
-                </Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Phí vận chuyển</Text>
-                <Text style={styles.summaryValue}>Miễn phí</Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.totalRow}>
-                <View>
-                  <Text style={styles.totalLabel}>Tổng tiền</Text>
-                  <Text style={styles.totalNote}>Đã gồm VAT và được làm tròn</Text>
-                </View>
-                <Text style={styles.totalValue}>
-                  {getTotalAmount().toLocaleString("vi-VN")}đ
-                </Text>
-              </View>
-            </View>
-
-            <OptionPayment
-              selectedMethod={paymentMethod}
-              onMethodChange={setPaymentMethod}
-            />
-
-            {receiveFormData && (
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>THÔNG TIN NHẬN HÀNG</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Người nhận</Text>
-                  <Text style={styles.infoValue}>{receiveFormData.name}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Số điện thoại</Text>
-                  <Text style={styles.infoValue}>{receiveFormData.phone}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Địa chỉ</Text>
-                  <Text style={styles.infoValue}>{receiveFormData.address}</Text>
-                </View>
-              </View>
-            )}
-          </>
+          <TabPayment
+            selectedMethod={paymentMethod}
+            onMethodChange={setPaymentMethod}
+          />
         )}
 
         {/* Bottom Spacing */}

@@ -44,14 +44,14 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
             />
             <View style={styles.productInfo}>
               <Text style={styles.productName} numberOfLines={2}>
-                {item.variant_name}
+                {item.variant_name || "Sản phẩm"}
               </Text>
               <View style={styles.priceContainer}>
                 <Text style={styles.salePrice}>
-                  {Number(item.sale_price).toLocaleString("vi-VN")}đ
+                  {(Number(item.sale_price) || 0).toLocaleString("vi-VN")}đ
                 </Text>
                 <Text style={styles.originalPrice}>
-                  {Number(item.price).toLocaleString("vi-VN")}đ
+                  {(Number(item.price) || 0).toLocaleString("vi-VN")}đ
                 </Text>
               </View>
             </View>

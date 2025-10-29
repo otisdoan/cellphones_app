@@ -190,15 +190,16 @@ export interface ProductVatiantProp {
   capacity: string;
   image_url: string;
   is_active: boolean;
+  quantity: number; // Added to match web version
+  checked?: boolean; // Added to match web version
   createdAt: string;
   updatedAt: string;
 }
 
 // Cart Item with Variant (extended with cart-specific fields)
+// Exactly like web version - just add checked field
 export interface CartItemWithVariant extends ProductVatiantProp {
   checked: boolean;
-  quantity: number;
-  cart_item_id: string; // ID của cart item trong database
 }
 
 export interface ProductVariantCapacity {

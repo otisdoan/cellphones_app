@@ -7,10 +7,7 @@ import React, {
 } from "react";
 import { cartItemApi } from "../utils/api/cart_item.api";
 import { productVariantApi } from "../utils/api/product_variant.api";
-import {
-  CartItemProps,
-  CartItemWithVariant,
-} from "../types/api";
+import { CartItemProps, CartItemWithVariant } from "../types/api";
 import { useAuth } from "./AuthContext";
 
 interface CartContextValue {
@@ -22,11 +19,11 @@ interface CartContextValue {
     variant_id: number,
     quantity?: number
   ) => Promise<boolean>;
-  updateQuantity: (cart_item_id: string, quantity: number) => Promise<void>;
-  deleteItem: (cart_item_id: string) => Promise<void>;
+  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
   fetchCart: () => Promise<void>;
   refreshCart: () => void;
-  toggleItemCheck: (cart_item_id: string) => void;
+  toggleItemCheck: (id: number) => void;
   toggleAllCheck: () => void;
   getCheckedItems: () => CartItemWithVariant[];
   getTotalPrice: () => number;
@@ -46,62 +43,45 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     try {
       setIsLoading(true);
+      console.log("🔄 Fetching cart for user:", user.id);
       const result = await cartItemApi.getById(user.id);
 
+      console.log("📥 Raw cart data:", result.data);
+
       if (Array.isArray(result.data)) {
-        // Extract variant IDs from cart items and create map for quantities
-        const cartItemsMap = new Map<
-          number,
-          { quantity: number; id: string }
-        >();
+        console.log("📊 Cart items count from API:", result.data.length);
+
+        // Get variant IDs from cart items (like web version)
+        const ids: number[] = [];
         result.data.forEach((item: CartItemProps) => {
-          cartItemsMap.set(item.variant_id, {
-            quantity: item.quantity,
-            id: item.id,
-          });
+          ids.push(Number(item.variant_id));
         });
 
-        const variantIds = Array.from(cartItemsMap.keys());
-        console.log("Cart variant IDs:", variantIds);
+        console.log("🔍 Variant IDs to fetch:", ids);
 
-        if (variantIds.length > 0) {
+        if (ids.length > 0) {
           // Fetch variant details by IDs
-          const variantResult =
-            await productVariantApi.getVariantByIds(variantIds);
+          console.log("🌐 Calling getVariantByIds with:", ids);
+          const variantResult = await productVariantApi.getVariantByIds(ids);
 
-          console.log("Fetched variants:", variantResult.data);
+          console.log("📦 Fetched variants response:", variantResult);
 
           if (Array.isArray(variantResult.data)) {
-            // Map variants to CartItemWithVariant with cart-specific fields
+            console.log(
+              "✅ Variants is array, length:",
+              variantResult.data.length
+            );
+
+            // Map variants with checked: false (exactly like web version)
             const cartItemsWithVariant: CartItemWithVariant[] =
-              variantResult.data
-                .map((variant) => {
-                  const cartInfo = cartItemsMap.get(variant.id);
+              variantResult.data.map(
+                (item) => ({ ...item, checked: false }) as CartItemWithVariant
+              );
 
-                  // Skip if cart info not found
-                  if (!cartInfo) {
-                    console.warn(
-                      `Cart info not found for variant ${variant.id}`
-                    );
-                    return null;
-                  }
-
-                  console.log('Mapping variant:', variant.id, 'with cart_item_id:', cartInfo.id, 'quantity:', cartInfo.quantity);
-
-                  return {
-                    ...variant,
-                    checked: false, // Default unchecked
-                    quantity: cartInfo.quantity,
-                    cart_item_id: cartInfo.id,
-                  };
-                })
-                .filter((item): item is CartItemWithVariant => item !== null);
-
-            console.log('Final cart items with variants:', cartItemsWithVariant.map(item => ({
-              variant_id: item.id,
-              cart_item_id: item.cart_item_id,
-              quantity: item.quantity
-            })));
+            console.log(
+              "📦 Final cart items count:",
+              cartItemsWithVariant.length
+            );
 
             setCartItems(cartItemsWithVariant);
             setTotalCart(cartItemsWithVariant.length);
@@ -110,9 +90,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           setCartItems([]);
           setTotalCart(0);
         }
+      } else {
+        setCartItems([]);
+        setTotalCart(0);
       }
     } catch (error) {
       console.error("Error fetching cart:", error);
+      setCartItems([]);
+      setTotalCart(0);
     } finally {
       setIsLoading(false);
     }
@@ -139,6 +124,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      console.log("Adding to cart:", {
+        user_id: user.id,
+        product_id,
+        variant_id,
+        quantity,
+      });
+
       await cartItemApi.create({
         user_id: user.id,
         product_id,
@@ -151,13 +143,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return true;
     } catch (error) {
       console.error("Error adding to cart:", error);
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+      }
       return false;
     }
   };
 
   const updateQuantity = async (id: string, quantity: number) => {
     try {
-      console.log('Updating cart item:', id, 'with quantity:', quantity);
       await cartItemApi.update(id, { quantity });
       await fetchCart();
     } catch (error) {
@@ -180,10 +174,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     fetchCart();
   }, [fetchCart]);
 
-  const toggleItemCheck = (cart_item_id: string) => {
+  const toggleItemCheck = (id: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.cart_item_id === cart_item_id ? { ...item, checked: !item.checked } : item
+        item.id === id ? { ...item, checked: !item.checked } : item
       )
     );
   };
@@ -202,7 +196,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const getTotalPrice = (): number => {
     return cartItems.reduce((total, item) => {
       if (item.checked) {
-        return total + Number(item.sale_price) * item.quantity;
+        const salePrice = Number(item.sale_price) || 0;
+        const quantity = Number(item.quantity) || 0;
+        return total + salePrice * quantity;
       }
       return total;
     }, 0);
@@ -211,9 +207,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const getSavedAmount = (): number => {
     return cartItems.reduce((total, item) => {
       if (item.checked) {
-        const saved =
-          (Number(item.price) - Number(item.sale_price)) * item.quantity;
-        return total + saved;
+        const price = Number(item.price) || 0;
+        const salePrice = Number(item.sale_price) || 0;
+        const quantity = Number(item.quantity) || 0;
+        const saved = (price - salePrice) * quantity;
+        return total + (saved > 0 ? saved : 0);
       }
       return total;
     }, 0);

@@ -45,12 +45,11 @@ export default function CartScreen() {
 
   const handleIncrease = async (item: any) => {
     try {
-      console.log('handleIncrease called with item:', item);
-      if (!item.cart_item_id) {
-        Alert.alert("Lỗi", "Không tìm thấy ID giỏ hàng");
+      if (!item.id) {
+        Alert.alert("Lỗi", "Không tìm thấy ID sản phẩm");
         return;
       }
-      await updateQuantity(item.cart_item_id, item.quantity + 1);
+      await updateQuantity(item.id.toString(), item.quantity + 1);
     } catch {
       Alert.alert("Lỗi", "Không thể cập nhật số lượng");
     }
@@ -59,12 +58,11 @@ export default function CartScreen() {
   const handleDecrease = async (item: any) => {
     if (item.quantity <= 1) return;
     try {
-      console.log('handleDecrease called with item:', item);
-      if (!item.cart_item_id) {
-        Alert.alert("Lỗi", "Không tìm thấy ID giỏ hàng");
+      if (!item.id) {
+        Alert.alert("Lỗi", "Không tìm thấy ID sản phẩm");
         return;
       }
-      await updateQuantity(item.cart_item_id, item.quantity - 1);
+      await updateQuantity(item.id.toString(), item.quantity - 1);
     } catch {
       Alert.alert("Lỗi", "Không thể cập nhật số lượng");
     }
@@ -81,7 +79,7 @@ export default function CartScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              await deleteItem(item.cart_item_id);
+              await deleteItem(item.id.toString());
             } catch {
               Alert.alert("Lỗi", "Không thể xóa sản phẩm");
             }
@@ -97,10 +95,10 @@ export default function CartScreen() {
       Alert.alert("Thông báo", "Vui lòng chọn sản phẩm để thanh toán");
       return;
     }
-    
+
     // Save order items to OrderContext
     await setOrderItems(checkedItems);
-    
+
     // Navigate to payment info screen
     router.push("/checkout/payment-info");
   };
@@ -173,9 +171,9 @@ export default function CartScreen() {
         {/* Cart Items */}
         {cartItems.map((item) => (
           <CartItemCard
-            key={item.cart_item_id}
+            key={item.id}
             item={item}
-            onToggleCheck={() => toggleItemCheck(item.cart_item_id)}
+            onToggleCheck={() => toggleItemCheck(item.id)}
             onIncrease={() => handleIncrease(item)}
             onDecrease={() => handleDecrease(item)}
             onDelete={() => handleDelete(item)}
@@ -191,7 +189,7 @@ export default function CartScreen() {
         totalPrice={totalPrice}
         savedAmount={savedAmount}
         checkedCount={checkedItems.reduce(
-          (sum, item) => sum + item.quantity,
+          (sum, item) => sum + (item.quantity || 0),
           0
         )}
         hasCheckedItems={checkedItems.length > 0}
