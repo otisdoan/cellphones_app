@@ -9,9 +9,12 @@ import TabletList from "@/components/home/sections/TabletList";
 import TiviList from "@/components/home/sections/TiviList";
 import HouseHoldList from "@/components/home/sections/HouseHoldList";
 import ClockSmartList from "@/components/home/sections/ClockSmartList";
+import { SpecialStudent } from "@/components/home/sections/SpecialStudent";
+import { SpecialPayment } from "@/components/home/sections/SpecialPayment";
+import { SpecialBrand } from "@/components/home/sections/SpecialBrand";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import { ScrollView, StatusBar, View } from "react-native";
+import { ScrollView, StatusBar, View, Image } from "react-native";
 
 export default function HomeScreen() {
   useFocusEffect(
@@ -30,6 +33,16 @@ export default function HomeScreen() {
         </View>
         <CategoryHome />
         <CarouselHome />
+        <Image
+          source={require("@/assets/special-b2s-dday2-mb.gif")}
+          style={{
+            width: "100%",
+            height: 120,
+            borderRadius: 12,
+            marginTop: 16,
+          }}
+          resizeMode="cover"
+        />
         <SmartphoneList />
         <ProductWatched />
         <LaptopList />
@@ -38,6 +51,9 @@ export default function HomeScreen() {
         <HouseHoldList />
         <ClockSmartList />
         <ProductSection />
+        <SpecialStudent />
+        <SpecialPayment />
+        <SpecialBrand />
       </ScrollView>
     </>
   );

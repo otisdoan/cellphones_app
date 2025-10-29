@@ -78,10 +78,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               variantResult.data
                 .map((variant) => {
                   const cartInfo = cartItemsMap.get(variant.id);
-                  
+
                   // Skip if cart info not found
                   if (!cartInfo) {
-                    console.warn(`Cart info not found for variant ${variant.id}`);
+                    console.warn(
+                      `Cart info not found for variant ${variant.id}`
+                    );
                     return null;
                   }
 

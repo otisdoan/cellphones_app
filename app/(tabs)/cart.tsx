@@ -145,16 +145,11 @@ export default function CartScreen() {
       >
         {/* Select All */}
         <View style={styles.selectAllContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={toggleAllCheck}
-            style={[
-              styles.checkbox,
-              allChecked && styles.checkboxChecked
-            ]}
+            style={[styles.checkbox, allChecked && styles.checkboxChecked]}
           >
-            {allChecked && (
-              <Ionicons name="checkmark" size={16} color="#fff" />
-            )}
+            {allChecked && <Ionicons name="checkmark" size={16} color="#fff" />}
           </TouchableOpacity>
           <Text style={styles.selectAllText}>Chọn tất cả</Text>
         </View>

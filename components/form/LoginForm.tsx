@@ -35,15 +35,15 @@ export default function LoginForm() {
     try {
       const result = await authApi.login(data);
       console.log("Login result:", result);
-      
+
       if (result.status === "success" && result.data) {
         // Check if data contains user and token, or is the user itself
         const userData = (result.data as any).user || result.data;
         const token = (result.data as any).token || "temp_token";
-        
+
         // Save to AuthContext
         await login(userData, token);
-        
+
         Alert.alert("Thành công", "Đăng nhập thành công!", [
           {
             text: "OK",
@@ -52,10 +52,7 @@ export default function LoginForm() {
         ]);
       }
     } catch (error: any) {
-      Alert.alert(
-        "Lỗi",
-        error.response?.data?.message || "Đăng nhập thất bại"
-      );
+      Alert.alert("Lỗi", error.response?.data?.message || "Đăng nhập thất bại");
       console.log(error);
     }
   };

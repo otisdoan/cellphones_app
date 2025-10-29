@@ -29,12 +29,9 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
       <View style={styles.mainContent}>
         <View style={styles.topRow}>
           <View style={styles.leftSection}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={onToggleCheck}
-              style={[
-                styles.checkbox,
-                item.checked && styles.checkboxChecked
-              ]}
+              style={[styles.checkbox, item.checked && styles.checkboxChecked]}
             >
               {item.checked && (
                 <Ionicons name="checkmark" size={16} color="#fff" />

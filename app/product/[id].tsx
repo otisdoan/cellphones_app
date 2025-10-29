@@ -114,20 +114,16 @@ const ProductDetailScreen = () => {
     const success = await addToCartContext(product.id, selectedVariantId, 1);
 
     if (success) {
-      Alert.alert(
-        "Thành công",
-        "Đã thêm sản phẩm vào giỏ hàng",
-        [
-          {
-            text: "Tiếp tục mua sắm",
-            style: "cancel",
-          },
-          {
-            text: "Xem giỏ hàng",
-            onPress: () => router.push("/(tabs)/cart"),
-          },
-        ]
-      );
+      Alert.alert("Thành công", "Đã thêm sản phẩm vào giỏ hàng", [
+        {
+          text: "Tiếp tục mua sắm",
+          style: "cancel",
+        },
+        {
+          text: "Xem giỏ hàng",
+          onPress: () => router.push("/(tabs)/cart"),
+        },
+      ]);
     } else {
       Alert.alert("Lỗi", "Không thể thêm sản phẩm vào giỏ hàng");
     }
