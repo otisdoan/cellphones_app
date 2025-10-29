@@ -26,7 +26,7 @@ export const SpecialPayment = () => {
 
   return (
     <View className="my-4">
-      <Text className="text-xl font-semibold mb-3 px-4">ƯU ĐÃI THANH TOÁN</Text>
+      <Text className="text-xl font-semibold mb-3">ƯU ĐÃI THANH TOÁN</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -12,6 +12,7 @@ import { ThemeProviderApp, useAppTheme } from "@/context/ThemeContext";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { OrderProvider } from "@/context/OrderContext";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -34,9 +35,11 @@ export default function RootLayout() {
       <ThemeProviderApp>
         <AuthProvider>
           <CartProvider>
-            <ProfileProvider>
-              <RootLayoutInner />
-            </ProfileProvider>
+            <OrderProvider>
+              <ProfileProvider>
+                <RootLayoutInner />
+              </ProfileProvider>
+            </OrderProvider>
           </CartProvider>
         </AuthProvider>
       </ThemeProviderApp>

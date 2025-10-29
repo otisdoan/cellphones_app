@@ -26,7 +26,7 @@ export const SpecialBrand = () => {
 
   return (
     <View className="my-4">
-      <Text className="text-xl font-semibold mb-3 px-4">
+      <Text className="text-xl font-semibold mb-3">
         CHUYÊN TRANG THƯƠNG HIỆU
       </Text>
       <ScrollView

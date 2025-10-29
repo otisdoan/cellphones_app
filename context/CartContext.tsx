@@ -9,7 +9,6 @@ import { cartItemApi } from "../utils/api/cart_item.api";
 import { productVariantApi } from "../utils/api/product_variant.api";
 import {
   CartItemProps,
-  ProductVatiantProp,
   CartItemWithVariant,
 } from "../types/api";
 import { useAuth } from "./AuthContext";
@@ -27,7 +26,7 @@ interface CartContextValue {
   deleteItem: (cart_item_id: string) => Promise<void>;
   fetchCart: () => Promise<void>;
   refreshCart: () => void;
-  toggleItemCheck: (variant_id: number) => void;
+  toggleItemCheck: (cart_item_id: string) => void;
   toggleAllCheck: () => void;
   getCheckedItems: () => CartItemWithVariant[];
   getTotalPrice: () => number;
@@ -87,6 +86,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     return null;
                   }
 
+                  console.log('Mapping variant:', variant.id, 'with cart_item_id:', cartInfo.id, 'quantity:', cartInfo.quantity);
+
                   return {
                     ...variant,
                     checked: false, // Default unchecked
@@ -95,6 +96,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                   };
                 })
                 .filter((item): item is CartItemWithVariant => item !== null);
+
+            console.log('Final cart items with variants:', cartItemsWithVariant.map(item => ({
+              variant_id: item.id,
+              cart_item_id: item.cart_item_id,
+              quantity: item.quantity
+            })));
 
             setCartItems(cartItemsWithVariant);
             setTotalCart(cartItemsWithVariant.length);
@@ -150,6 +157,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateQuantity = async (id: string, quantity: number) => {
     try {
+      console.log('Updating cart item:', id, 'with quantity:', quantity);
       await cartItemApi.update(id, { quantity });
       await fetchCart();
     } catch (error) {
@@ -172,10 +180,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     fetchCart();
   }, [fetchCart]);
 
-  const toggleItemCheck = (variant_id: number) => {
+  const toggleItemCheck = (cart_item_id: string) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === variant_id ? { ...item, checked: !item.checked } : item
+        item.cart_item_id === cart_item_id ? { ...item, checked: !item.checked } : item
       )
     );
   };

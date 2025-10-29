@@ -26,7 +26,7 @@ export const SpecialStudent = () => {
 
   return (
     <View className="my-4">
-      <Text className="text-xl font-semibold mb-3 px-4">ƯU ĐÃI SINH VIÊN</Text>
+      <Text className="text-xl font-semibold mb-3">ƯU ĐÃI SINH VIÊN</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

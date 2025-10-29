@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { useOrder } from "@/context/OrderContext";
 import LoginPromptModal from "@/components/modals/LoginPromptModal";
 import CartItemCard from "@/components/cart/CartItemCard";
 import CartEmptyState from "@/components/cart/CartEmptyState";
@@ -33,6 +34,7 @@ export default function CartScreen() {
     getTotalPrice,
     getSavedAmount,
   } = useCart();
+  const { setOrderItems } = useOrder();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
@@ -43,6 +45,11 @@ export default function CartScreen() {
 
   const handleIncrease = async (item: any) => {
     try {
+      console.log('handleIncrease called with item:', item);
+      if (!item.cart_item_id) {
+        Alert.alert("Lỗi", "Không tìm thấy ID giỏ hàng");
+        return;
+      }
       await updateQuantity(item.cart_item_id, item.quantity + 1);
     } catch {
       Alert.alert("Lỗi", "Không thể cập nhật số lượng");
@@ -52,6 +59,11 @@ export default function CartScreen() {
   const handleDecrease = async (item: any) => {
     if (item.quantity <= 1) return;
     try {
+      console.log('handleDecrease called with item:', item);
+      if (!item.cart_item_id) {
+        Alert.alert("Lỗi", "Không tìm thấy ID giỏ hàng");
+        return;
+      }
       await updateQuantity(item.cart_item_id, item.quantity - 1);
     } catch {
       Alert.alert("Lỗi", "Không thể cập nhật số lượng");
@@ -79,14 +91,18 @@ export default function CartScreen() {
     );
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     const checkedItems = getCheckedItems();
     if (checkedItems.length === 0) {
       Alert.alert("Thông báo", "Vui lòng chọn sản phẩm để thanh toán");
       return;
     }
-    // TODO: Navigate to checkout page
-    Alert.alert("Thông báo", "Chức năng thanh toán đang được phát triển");
+    
+    // Save order items to OrderContext
+    await setOrderItems(checkedItems);
+    
+    // Navigate to payment info screen
+    router.push("/checkout/payment-info");
   };
 
   if (!isAuthenticated) {
@@ -157,9 +173,9 @@ export default function CartScreen() {
         {/* Cart Items */}
         {cartItems.map((item) => (
           <CartItemCard
-            key={item.id}
+            key={item.cart_item_id}
             item={item}
-            onToggleCheck={() => toggleItemCheck(item.id)}
+            onToggleCheck={() => toggleItemCheck(item.cart_item_id)}
             onIncrease={() => handleIncrease(item)}
             onDecrease={() => handleDecrease(item)}
             onDelete={() => handleDelete(item)}
