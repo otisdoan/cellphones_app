@@ -188,6 +188,7 @@ export interface ProductVatiantProp {
   dimensions: string;
   color: string;
   capacity: string;
+  image_url: string;
   is_active: boolean;
   createdAt: string;
   updatedAt: string;

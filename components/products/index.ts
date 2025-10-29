@@ -1,2 +1,9 @@
 export { default as ProductHome } from "./ProductHome";
 export { default as ProductNoSlice } from "./ProductNoSlice";
+export { default as ProductCard } from "./ProductCard";
+export { default as CarouselProduct } from "./CarouselProduct";
+export { default as ProductCommitments } from "./ProductCommitments";
+export { default as AttributeProduct } from "./AttributeProduct";
+export { default as OptionProduct } from "./OptionProduct";
+export { default as GiftProduct } from "./GiftProduct";
+export { default as FavoriteProduct } from "./FavoriteProduct";

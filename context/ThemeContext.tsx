@@ -1,85 +1,63 @@
-import React, {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-// Delayed persistence to avoid missing module error if AsyncStorage not installed
-import { setColorScheme } from "nativewind";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useColorScheme } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export type AppTheme = "light" | "dark";
-
-type ThemeContextValue = {
-  theme: AppTheme;
+interface ThemeContextType {
   isDark: boolean;
   toggleTheme: () => void;
-  setTheme: (next: AppTheme) => void;
-};
-
-export const ThemeContext = createContext<ThemeContextValue>({
-  theme: "light",
-  isDark: false,
-  toggleTheme: () => {},
-  setTheme: () => {},
-});
-
-const STORAGE_KEY = "APP_THEME_PREFERENCE";
-
-async function getStoredTheme(): Promise<AppTheme | null> {
-  try {
-    // @ts-expect-error
-    return (globalThis.__APP_THEME__ as AppTheme | undefined) ?? null;
-  } catch {
-    return null;
-  }
 }
 
-async function setStoredTheme(next: AppTheme): Promise<void> {
-  try {
-    // @ts-expect-error
-    globalThis.__APP_THEME__ = next;
-  } catch {}
-}
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProviderApp({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<AppTheme>("light");
+export const ThemeProviderApp: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const systemColorScheme = useColorScheme();
+  const [isDark, setIsDark] = useState(systemColorScheme === "dark");
+
+  const loadThemePreference = async () => {
+    try {
+      const savedTheme = await AsyncStorage.getItem("themePreference");
+      if (savedTheme !== null) {
+        setIsDark(savedTheme === "dark");
+      } else {
+        setIsDark(systemColorScheme === "dark");
+      }
+    } catch (error) {
+      console.error("Error loading theme preference:", error);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      const saved = await getStoredTheme();
-      if (saved === "light" || saved === "dark") {
-        setThemeState(saved);
-        try {
-          setColorScheme(saved);
-        } catch {}
-      }
-    })();
+    // Load saved theme preference
+    loadThemePreference();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const setTheme = useCallback(async (next: AppTheme) => {
-    setThemeState(next);
-    await setStoredTheme(next);
+  const toggleTheme = async () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
     try {
-      setColorScheme(next);
-    } catch {}
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  }, [setTheme]);
-
-  const value = useMemo(
-    () => ({ theme, isDark: theme === "dark", toggleTheme, setTheme }),
-    [theme, toggleTheme, setTheme]
-  );
+      await AsyncStorage.setItem(
+        "themePreference",
+        newTheme ? "dark" : "light"
+      );
+    } catch (error) {
+      console.error("Error saving theme preference:", error);
+    }
+  };
 
   return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
   );
-}
+};
 
-export function useAppTheme() {
-  const ctx = React.useContext(ThemeContext);
-  return ctx;
-}
+export const useAppTheme = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useAppTheme must be used within a ThemeProviderApp");
+  }
+  return context;
+};

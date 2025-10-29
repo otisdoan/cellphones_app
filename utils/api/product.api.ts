@@ -19,6 +19,13 @@ export const productApi = {
     );
     return response.data;
   },
+  // Endpoint mới để lấy product kèm images
+  getByIdWithImages: async (id: number) => {
+    const response = await axiosInstance.get<ProductResponse<ProductProps>>(
+      `${API_URL.PRODUCT}/${id}`
+    );
+    return response.data;
+  },
   getProductBySlug: async (slug: string) => {
     const response = await axiosInstance.get<ProductResponse<ProductProps>>(
       `${API_URL.OTHER_PRODUCT.GET_BY_SLUG}${slug}`

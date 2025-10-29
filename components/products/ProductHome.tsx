@@ -62,8 +62,8 @@ const ProductHome = ({
     return Number(price).toLocaleString("vi-VN");
   };
 
-  const navigateToProduct = (slug: string) => {
-    router.push(`/(tabs)/product/${slug}` as any);
+  const navigateToProduct = (id: number) => {
+    router.push(`/product/${id}` as any);
   };
 
   if (loading) {
@@ -130,7 +130,7 @@ const ProductHome = ({
                   <Pressable
                     key={index}
                     style={styles.productItem}
-                    onPress={() => navigateToProduct(item.slug)}
+                    onPress={() => navigateToProduct(item.id)}
                   >
                     <View style={styles.imageContainer}>
                       <Image
