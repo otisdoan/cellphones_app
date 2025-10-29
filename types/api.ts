@@ -194,6 +194,13 @@ export interface ProductVatiantProp {
   updatedAt: string;
 }
 
+// Cart Item with Variant (extended with cart-specific fields)
+export interface CartItemWithVariant extends ProductVatiantProp {
+  checked: boolean;
+  quantity: number;
+  cart_item_id: string; // ID của cart item trong database
+}
+
 export interface ProductVariantCapacity {
   capacity: string;
   count: number;

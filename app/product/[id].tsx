@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,10 +18,15 @@ import AttributeProduct from "@/components/products/AttributeProduct";
 import OptionProduct from "@/components/products/OptionProduct";
 import GiftProduct from "@/components/products/GiftProduct";
 import FavoriteProduct from "@/components/products/FavoriteProduct";
+import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import LoginPromptModal from "@/components/modals/LoginPromptModal";
 
 const ProductDetailScreen = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { addToCart: addToCartContext } = useCart();
+  const { isAuthenticated } = useAuth();
   const [product, setProduct] = useState<ProductProps | null>(null);
   const [productImages, setProductImages] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,6 +34,7 @@ const ProductDetailScreen = () => {
     null
   );
   const [variantImage, setVariantImage] = useState<string>("");
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
 
   const getProductDetail = async () => {
     try {
@@ -87,12 +94,43 @@ const ProductDetailScreen = () => {
     setVariantImage(image);
   };
 
-  const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log("Add to cart:", {
-      productId: product?.id,
-      variantId: selectedVariantId,
-    });
+  const handleAddToCart = async () => {
+    if (!product?.id) {
+      Alert.alert("Lỗi", "Không tìm thấy sản phẩm");
+      return;
+    }
+
+    if (!selectedVariantId) {
+      Alert.alert("Thông báo", "Vui lòng chọn phiên bản và màu sắc");
+      return;
+    }
+
+    // Check if user is logged in
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const success = await addToCartContext(product.id, selectedVariantId, 1);
+
+    if (success) {
+      Alert.alert(
+        "Thành công",
+        "Đã thêm sản phẩm vào giỏ hàng",
+        [
+          {
+            text: "Tiếp tục mua sắm",
+            style: "cancel",
+          },
+          {
+            text: "Xem giỏ hàng",
+            onPress: () => router.push("/(tabs)/cart"),
+          },
+        ]
+      );
+    } else {
+      Alert.alert("Lỗi", "Không thể thêm sản phẩm vào giỏ hàng");
+    }
   };
 
   const handleBuyNow = () => {
@@ -201,7 +239,11 @@ const ProductDetailScreen = () => {
         {/* Gift */}
         {product.id && (
           <View style={styles.section}>
-            <GiftProduct product_id={product.id} />
+            <GiftProduct
+              product_id={product.id}
+              onAddToCart={handleAddToCart}
+              selectedVariantId={selectedVariantId}
+            />
           </View>
         )}
 
@@ -254,6 +296,12 @@ const ProductDetailScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Login Prompt Modal */}
+      <LoginPromptModal
+        visible={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
     </View>
   );
 };

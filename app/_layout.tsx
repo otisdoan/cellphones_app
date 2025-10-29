@@ -10,6 +10,8 @@ import "react-native-reanimated";
 import "../global.css";
 import { ThemeProviderApp, useAppTheme } from "@/context/ThemeContext";
 import { ProfileProvider } from "@/context/ProfileContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -30,9 +32,13 @@ export default function RootLayout() {
   return (
     <PaperProvider>
       <ThemeProviderApp>
-        <ProfileProvider>
-          <RootLayoutInner />
-        </ProfileProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ProfileProvider>
+              <RootLayoutInner />
+            </ProfileProvider>
+          </CartProvider>
+        </AuthProvider>
       </ThemeProviderApp>
     </PaperProvider>
   );

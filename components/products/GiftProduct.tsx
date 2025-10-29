@@ -1,12 +1,25 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface GiftProductProps {
   product_id: number;
+  onAddToCart?: () => void;
+  selectedVariantId?: number | null;
 }
 
-const GiftProduct: React.FC<GiftProductProps> = ({ product_id }) => {
+const GiftProduct: React.FC<GiftProductProps> = ({
+  product_id,
+  onAddToCart,
+  selectedVariantId,
+}) => {
   const promotions = [
     {
       content:
@@ -115,6 +128,32 @@ const GiftProduct: React.FC<GiftProductProps> = ({ product_id }) => {
           </View>
         ))}
       </View>
+
+      {/* Add to Cart Button */}
+      {onAddToCart && (
+        <TouchableOpacity
+          style={[
+            styles.addToCartButton,
+            !selectedVariantId && styles.addToCartButtonDisabled,
+          ]}
+          onPress={onAddToCart}
+          disabled={!selectedVariantId}
+        >
+          <Ionicons
+            name="cart-outline"
+            size={20}
+            color={selectedVariantId ? "#fff" : "#a0a0a0"}
+          />
+          <Text
+            style={[
+              styles.addToCartText,
+              !selectedVariantId && styles.addToCartTextDisabled,
+            ]}
+          >
+            Thêm vào giỏ hàng
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -252,6 +291,27 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     lineHeight: 18,
+  },
+  addToCartButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#d70019",
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
+    gap: 8,
+  },
+  addToCartButtonDisabled: {
+    backgroundColor: "#e5e5e5",
+  },
+  addToCartText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  addToCartTextDisabled: {
+    color: "#a0a0a0",
   },
 });
 

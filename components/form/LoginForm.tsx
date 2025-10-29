@@ -4,9 +4,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Text, View } from "react-native";
+import { Text, View, Alert } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
 import * as yup from "yup";
+import { useAuth } from "@/context/AuthContext";
 
 const loginSchema = yup.object({
   phone: yup
@@ -17,6 +18,7 @@ const loginSchema = yup.object({
 });
 
 export default function LoginForm() {
+  const { login } = useAuth();
   const {
     control,
     handleSubmit,
@@ -32,12 +34,28 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormType) => {
     try {
       const result = await authApi.login(data);
-      if (result) {
-        setTimeout(() => {
-          router.replace("/");
-        }, 2000);
+      console.log("Login result:", result);
+      
+      if (result.status === "success" && result.data) {
+        // Check if data contains user and token, or is the user itself
+        const userData = (result.data as any).user || result.data;
+        const token = (result.data as any).token || "temp_token";
+        
+        // Save to AuthContext
+        await login(userData, token);
+        
+        Alert.alert("Thành công", "Đăng nhập thành công!", [
+          {
+            text: "OK",
+            onPress: () => router.replace("/"),
+          },
+        ]);
       }
-    } catch (error) {
+    } catch (error: any) {
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Đăng nhập thất bại"
+      );
       console.log(error);
     }
   };

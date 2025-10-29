@@ -5,6 +5,7 @@ import { HapticTab } from "@/components/haptic-tab";
 import PriceAddress from "@/components/home/PriceAddress";
 import SvgLogo from "@/components/svg/SvgLogo";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useCart } from "@/context/CartContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -16,6 +17,7 @@ export default function TabLayout() {
   const [visible, setVisible] = useState(false);
   const hideModal = () => setVisible(false);
   const inputRef = useRef(null);
+  const { totalCart } = useCart();
 
   return (
     <>
@@ -107,7 +109,35 @@ export default function TabLayout() {
           options={{
             title: "Giỏ hàng",
             tabBarIcon: ({ color }) => (
-              <AntDesign name="shopping-cart" size={24} color={color} />
+              <View>
+                <AntDesign name="shopping-cart" size={24} color={color} />
+                {totalCart > 0 && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: -8,
+                      right: -10,
+                      backgroundColor: "#d70019",
+                      borderRadius: 10,
+                      minWidth: 20,
+                      height: 20,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 4,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 11,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {totalCart > 99 ? "99+" : totalCart}
+                    </Text>
+                  </View>
+                )}
+              </View>
             ),
           }}
         />

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Dimensions, Text, View } from "react-native";
+import { Dimensions, Image, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
   ICarouselInstance,
@@ -8,12 +8,20 @@ import Carousel, {
 
 const { width } = Dimensions.get("window");
 
+const bannerImages = [
+  require("@/assets/images/banners/carousel-1.webp"),
+  require("@/assets/images/banners/carousel-2.webp"),
+  require("@/assets/images/banners/carousel-3.webp"),
+  require("@/assets/images/banners/carousel-4.webp"),
+  require("@/assets/images/banners/carousel-5.webp"),
+  require("@/assets/images/banners/carousel-6.webp"),
+  require("@/assets/images/banners/carousel-7.png"),
+  require("@/assets/images/banners/carousel-8.png"),
+];
+
 export const CarouselHome = () => {
   const ref = useRef<ICarouselInstance>(null);
-  const data = [1, 2, 3, 4, 5];
   const progress = useSharedValue<number>(0);
-
-  const colors = ["#B0604D", "#899F9C", "#B3C680", "#5C6265", "#F5D399"];
 
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
@@ -31,24 +39,27 @@ export const CarouselHome = () => {
         height={200}
         autoPlay
         autoPlayInterval={3000}
-        data={data}
+        data={bannerImages}
         scrollAnimationDuration={800}
         onProgressChange={(_, absoluteProgress) => {
           progress.value = absoluteProgress;
         }}
-        renderItem={({ index }) => (
+        renderItem={({ item }) => (
           <View
             style={{
               flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: colors[index % colors.length],
               borderRadius: 12,
+              overflow: "hidden",
             }}
           >
-            <Text style={{ color: "#fff", fontSize: 20 }}>
-              Slide {index + 1}
-            </Text>
+            <Image
+              source={item}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              resizeMode="cover"
+            />
           </View>
         )}
       />
@@ -56,7 +67,7 @@ export const CarouselHome = () => {
       <View className="mt-3 flex-row justify-center">
         <Pagination.Basic
           progress={progress}
-          data={data}
+          data={bannerImages}
           dotStyle={{
             width: 8,
             height: 8,
