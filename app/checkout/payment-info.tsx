@@ -12,18 +12,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useOrder } from "@/context/OrderContext";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import TabInfor from "@/components/checkout/TabInfor";
 import TabPayment from "@/components/checkout/TabPayment";
 import { paymentApi } from "@/utils/api/payment.api";
+import { orderApi } from "@/utils/api/order.api";
 
 export default function PaymentInfoScreen() {
   const router = useRouter();
-  const { orderItems, setOrderAddress, getTotalAmount } = useOrder();
+  const { orderItems, setOrderAddress, getTotalAmount, clearOrder } =
+    useOrder();
+  const { user } = useAuth();
+  const { clearCheckedItems } = useCart();
   const [activeTab, setActiveTab] = useState<"info" | "payment">("info");
   const [paymentMethod, setPaymentMethod] = useState<
     "cod" | "transfer" | "wallet" | "card"
   >("cod");
   const [receiveFormData, setReceiveFormData] = useState<any>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFormDataChange = (data: any) => {
     setReceiveFormData(data);
@@ -50,29 +57,130 @@ export default function PaymentInfoScreen() {
       return;
     }
 
+    if (!user?.id) {
+      Alert.alert("Lỗi", "Vui lòng đăng nhập để tiếp tục");
+      return;
+    }
+
     try {
-      const amount = getTotalAmount();
+      setIsProcessing(true);
 
-      const result = await paymentApi.checkout({
-        orderCode: Date.now(),
-        amount: amount,
-        description: `Thanh toán đơn hàng`,
-        returnUrl: `${window.location?.origin || "cellphones://payment-success"}`,
-        cancelUrl: `${window.location?.origin || "cellphones://payment-cancel"}`,
-      });
+      // Calculate totals
+      const subtotal = orderItems.reduce(
+        (total, item) =>
+          total + Number(item.sale_price || item.price) * item.quantity,
+        0
+      );
 
-      if (result && result.checkoutUrl) {
-        // Open payment URL
-        const canOpen = await Linking.canOpenURL(result.checkoutUrl);
-        if (canOpen) {
-          await Linking.openURL(result.checkoutUrl);
+      // 1. CREATE ORDER FIRST
+      const shippingAddress = `${receiveFormData.name}, ${receiveFormData.phone}, ${receiveFormData.address}`;
+
+      const orderData: any = {
+        order_number: `ORD${Date.now()}`,
+        user_id: Number(user.id),
+        guest_email: receiveFormData.email || user.email || "",
+        guest_phone: receiveFormData.phone || user.phone || "",
+        status: "pending",
+        payment_status: "pending",
+        payment_method: paymentMethod === "cod" ? "cash" : "bank_transfer",
+        subtotal: subtotal.toString(),
+        discount_amount: "0",
+        shipping_fee: "0",
+        tax_amount: "0",
+        total_amount: subtotal.toString(),
+        currency: "VND",
+        notes: `Địa chỉ: ${shippingAddress}${receiveFormData.note ? `\nGhi chú: ${receiveFormData.note}` : ""}`,
+        items: orderItems.map((item) => {
+          const variantId = item.id ? Number(item.id) : null;
+          return {
+            product_id: Number(item.product_id),
+            variant_id: variantId,
+            product_name: item.variant_name || `Product ${item.product_id}`,
+            variant_name: item.variant_name || null,
+            sku: item.sku || `SKU${item.product_id}`,
+            price: Number(item.price),
+            sale_price: Number(item.sale_price || item.price),
+            quantity: Number(item.quantity),
+            image_url: item.image_url || null,
+          };
+        }),
+      };
+
+      console.log("📦 Order Data to send:", JSON.stringify(orderData, null, 2));
+
+      const createdOrder = await orderApi.create(orderData);
+
+      if (!createdOrder?.data) {
+        Alert.alert("Lỗi", "Tạo đơn hàng thất bại");
+        setIsProcessing(false);
+        return;
+      }
+
+      const orderResponse = createdOrder.data;
+      const orderId = Array.isArray(orderResponse)
+        ? orderResponse[0]?.id
+        : orderResponse.id;
+
+      if (!orderId) {
+        Alert.alert("Lỗi", "Không thể lấy mã đơn hàng");
+        setIsProcessing(false);
+        return;
+      }
+
+      // 2. PAYMENT - COD or Online
+      if (paymentMethod === "cod") {
+        // COD - Clear cart and navigate to success
+        await clearCheckedItems();
+        clearOrder();
+        Alert.alert(
+          "Đặt hàng thành công",
+          "Đơn hàng của bạn đã được tạo. Vui lòng thanh toán khi nhận hàng.",
+          [
+            {
+              text: "Xem đơn hàng",
+              onPress: () => {
+                router.push("/profile/orders");
+              },
+            },
+          ]
+        );
+      } else {
+        // Online payment
+        const paymentOrderCode = Date.now();
+        const result = await paymentApi.checkout({
+          orderCode: paymentOrderCode,
+          amount: subtotal,
+          description: "Thanh toan don hang", // Max 25 characters
+          returnUrl: `cellphonesapp://order/success/${orderId}?paymentCode=${paymentOrderCode}`,
+          cancelUrl: `cellphonesapp://order/failed/${orderId}?paymentCode=${paymentOrderCode}`,
+        });
+
+        if (result?.checkoutUrl) {
+          const canOpen = await Linking.canOpenURL(result.checkoutUrl);
+          if (canOpen) {
+            await Linking.openURL(result.checkoutUrl);
+            // Clear cart and order after opening payment
+            await clearCheckedItems();
+            clearOrder();
+          } else {
+            Alert.alert("Lỗi", "Không thể mở trang thanh toán");
+          }
         } else {
-          Alert.alert("Lỗi", "Không thể mở trang thanh toán");
+          Alert.alert("Lỗi", "Không thể tạo link thanh toán");
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
-      Alert.alert("Lỗi", "Không thể thực hiện thanh toán");
+      console.error("Error response:", error?.response?.data);
+      console.error("Error status:", error?.response?.status);
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Có lỗi xảy ra khi xử lý thanh toán";
+      Alert.alert("Lỗi", errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -178,11 +286,25 @@ export default function PaymentInfoScreen() {
             </Text>
           </View>
           <TouchableOpacity
-            style={styles.actionButton}
-            onPress={activeTab === "info" ? handleContinue : handlePayment}
+            style={[
+              styles.actionButton,
+              isProcessing && styles.actionButtonDisabled,
+            ]}
+            onPress={
+              isProcessing
+                ? undefined
+                : activeTab === "info"
+                  ? handleContinue
+                  : handlePayment
+            }
+            disabled={isProcessing}
           >
             <Text style={styles.actionButtonText}>
-              {activeTab === "info" ? "Tiếp tục" : "Thanh toán"}
+              {isProcessing
+                ? "Đang xử lý..."
+                : activeTab === "info"
+                  ? "Tiếp tục"
+                  : "Thanh toán"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -343,6 +465,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 8,
+  },
+  actionButtonDisabled: {
+    backgroundColor: "#9ca3af",
+    opacity: 0.6,
   },
   actionButtonText: {
     color: "#fff",

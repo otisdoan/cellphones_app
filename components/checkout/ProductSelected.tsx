@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     gap: 12,
     paddingBottom: 12,
+    paddingTop: 12,
   },
   productItem: {
     position: "relative",

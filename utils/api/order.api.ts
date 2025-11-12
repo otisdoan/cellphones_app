@@ -2,6 +2,34 @@ import { API_URL } from "../../constants/API_URL";
 import type { OrderProps, OrderResponse } from "../../types/api";
 import axiosInstance from "../axios";
 
+export interface CreateOrderPayload {
+  order_number: string;
+  user_id: string;
+  guest_email: string;
+  guest_phone: string;
+  status: string;
+  payment_status: string;
+  payment_method: string;
+  subtotal: string;
+  discount_amount: string;
+  shipping_fee: string;
+  tax_amount: string;
+  total_amount: string;
+  currency: string;
+  notes: string;
+  items: {
+    product_id: number;
+    variant_id: number | null;
+    product_name: string;
+    variant_name: string | null;
+    sku: string;
+    price: number;
+    sale_price: number;
+    quantity: number;
+    image_url: string | null;
+  }[];
+}
+
 export const orderApi = {
   getAll: async () => {
     const response = await axiosInstance.get<OrderResponse<OrderProps>>(
@@ -15,7 +43,7 @@ export const orderApi = {
     );
     return response.data;
   },
-  create: async (payload: OrderProps) => {
+  create: async (payload: CreateOrderPayload | OrderProps) => {
     const response = await axiosInstance.post<OrderResponse<OrderProps>>(
       API_URL.ORDER,
       payload

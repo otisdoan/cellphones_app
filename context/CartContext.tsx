@@ -28,6 +28,7 @@ interface CartContextValue {
   getCheckedItems: () => CartItemWithVariant[];
   getTotalPrice: () => number;
   getSavedAmount: () => number;
+  clearCheckedItems: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -217,6 +218,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, 0);
   };
 
+  const clearCheckedItems = async (): Promise<void> => {
+    try {
+      const checkedItems = cartItems.filter((item) => item.checked);
+      // Delete all checked items
+      await Promise.all(
+        checkedItems.map((item) => cartItemApi.delete(String(item.id)))
+      );
+      // Refresh cart after deletion
+      await fetchCart();
+    } catch (error) {
+      console.error("Error clearing checked items:", error);
+    }
+  };
+
   const value: CartContextValue = {
     cartItems,
     totalCart,
@@ -231,6 +246,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     getCheckedItems,
     getTotalPrice,
     getSavedAmount,
+    clearCheckedItems,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
