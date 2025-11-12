@@ -1,18 +1,17 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Image,
-  Dimensions,
   StyleSheet,
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
 import { ProductProps } from "../../types/api";
 import SkeletonProduct from "../skeleton/SkeletonProduct";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 interface ProductNoSliceProps {
   title?: string;
@@ -22,9 +21,6 @@ interface ProductNoSliceProps {
   loading?: boolean;
 }
 
-const { width: screenWidth } = Dimensions.get("window");
-const itemWidth = screenWidth * 0.45; // 45% of screen width for each item
-
 const ProductNoSlice = ({
   title,
   brand,
@@ -32,32 +28,6 @@ const ProductNoSlice = ({
   suggest = false,
   loading = false,
 }: ProductNoSliceProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollViewRef = useRef<ScrollView>(null);
-
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      const newIndex = currentIndex - 1;
-      setCurrentIndex(newIndex);
-      scrollViewRef.current?.scrollTo({
-        x: newIndex * itemWidth,
-        animated: true,
-      });
-    }
-  };
-
-  const handleNext = () => {
-    const maxIndex = Math.ceil(list.length / 2) - 1; // 2 items per page
-    if (currentIndex < maxIndex) {
-      const newIndex = currentIndex + 1;
-      setCurrentIndex(newIndex);
-      scrollViewRef.current?.scrollTo({
-        x: newIndex * itemWidth * 2,
-        animated: true,
-      });
-    }
-  };
-
   const formatPrice = (price: string) => {
     return Number(price).toLocaleString("vi-VN");
   };
@@ -76,7 +46,7 @@ const ProductNoSlice = ({
           </View>
         )}
         <View style={styles.skeletonContainer}>
-          {Array.from({ length: suggest ? 2 : 5 }).map((_, index) => (
+          {Array.from({ length: suggest ? 2 : 4 }).map((_, index) => (
             <SkeletonProduct key={index} />
           ))}
         </View>
@@ -93,7 +63,6 @@ const ProductNoSlice = ({
         </View>
       )}
 
-      {/* Brand filters */}
       {brand && brand.length > 0 && (
         <ScrollView
           horizontal
@@ -112,131 +81,86 @@ const ProductNoSlice = ({
         </ScrollView>
       )}
 
-      {/* Products Carousel */}
-      <View style={styles.carouselContainer}>
-        <ScrollView
-          ref={scrollViewRef}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={(event) => {
-            const index = Math.round(
-              event.nativeEvent.contentOffset.x / (itemWidth * 2)
-            );
-            setCurrentIndex(index);
-          }}
-        >
-          {Array.from({ length: Math.ceil(list.length / 2) }).map(
-            (_, groupIndex) => (
-              <View key={groupIndex} style={styles.productGroup}>
-                <View style={styles.productRow}>
-                  {list
-                    .slice(groupIndex * 2, (groupIndex + 1) * 2)
-                    .map((item, index) => (
-                      <Pressable
-                        key={index}
-                        style={styles.productItem}
-                        onPress={() => navigateToProduct(item.id)}
-                      >
-                        <View style={styles.imageContainer}>
-                          <Image
-                            source={{
-                              uri: item.product_image
-                                ? item.product_image[0]
-                                : "",
-                            }}
-                            style={styles.productImage}
-                            resizeMode="contain"
-                          />
-                        </View>
+      <View style={styles.productGrid}>
+        {list.slice(0, suggest ? 2 : 4).map((item, index) => (
+          <View key={index} style={styles.productWrapper}>
+            <Pressable
+              style={styles.productItem}
+              onPress={() => navigateToProduct(item.id)}
+            >
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{
+                    uri: item.product_image ? item.product_image[0] : "",
+                  }}
+                  style={styles.productImage}
+                  resizeMode="contain"
+                />
+              </View>
 
-                        <Text style={styles.productName} numberOfLines={2}>
-                          {item.name}
-                        </Text>
+              <Text style={styles.productName} numberOfLines={2}>
+                {item.name}
+              </Text>
 
-                        <View style={styles.priceContainer}>
-                          <Text style={styles.currentPrice}>
-                            {formatPrice(item.price)}đ
-                          </Text>
-                          <Text style={styles.originalPrice}>
-                            {formatPrice(item.cost_price)}đ
-                          </Text>
-                        </View>
+              <View style={styles.priceContainer}>
+                <Text style={styles.currentPrice}>
+                  {formatPrice(item.price)}đ
+                </Text>
+                <Text style={styles.originalPrice}>
+                  {formatPrice(item.cost_price)}đ
+                </Text>
+              </View>
 
-                        <View style={styles.badgesContainer}>
-                          <View style={styles.badge}>
-                            <Text style={styles.badgeText}>
-                              Smember giảm đến 450.000đ
-                            </Text>
-                          </View>
-                          {!suggest && (
-                            <View style={[styles.badge, styles.badgeSecondary]}>
-                              <Text style={styles.badgeTextSecondary}>
-                                S-Student giảm thêm 300.000đ
-                              </Text>
-                            </View>
-                          )}
-                          {!suggest && (
-                            <View style={[styles.badge, styles.badgeTertiary]}>
-                              <Text style={styles.badgeTextTertiary}>
-                                Không phí chuyển đổi khi trả góp 0% qua thẻ tín
-                                dụng kỳ hạn 3-6 tháng
-                              </Text>
-                            </View>
-                          )}
-                        </View>
+              <View style={styles.badgesContainer}>
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    Smember giảm đến 450.000đ
+                  </Text>
+                </View>
+                {!suggest && (
+                  <View style={[styles.badge, styles.badgeSecondary]}>
+                    <Text style={styles.badgeTextSecondary}>
+                      S-Student giảm thêm 300.000đ
+                    </Text>
+                  </View>
+                )}
+                {!suggest && (
+                  <View style={[styles.badge, styles.badgeTertiary]}>
+                    <Text style={styles.badgeTextTertiary}>
+                      Không phí chuyển đổi khi trả góp 0% qua thẻ tín dụng kỳ
+                      hạn 3-6 tháng
+                    </Text>
+                  </View>
+                )}
+              </View>
 
-                        <View style={styles.footer}>
-                          <View style={styles.ratingContainer}>
-                            <AntDesign name="star" size={12} color="#ffd531" />
-                            <Text style={styles.ratingText}>
-                              {item.rating_average}
-                            </Text>
-                          </View>
-                          <View style={styles.favoriteContainer}>
-                            <AntDesign name="heart" size={12} color="#3c82f6" />
-                            <Text style={styles.favoriteText}>Yêu thích</Text>
-                          </View>
-                        </View>
-
-                        {/* Discount Badge */}
-                        <View style={styles.discountBadge}>
-                          <Text style={styles.discountText}>
-                            <Text style={styles.discountLabel}>Giảm</Text>
-                            <Text style={styles.discountValue}> 14%</Text>
-                          </Text>
-                        </View>
-
-                        {/* Installment Badge */}
-                        <View style={styles.installmentBadge}>
-                          <Text style={styles.installmentText}>
-                            <Text style={styles.installmentLabel}>Trả góp</Text>
-                            <Text style={styles.installmentValue}> 0%</Text>
-                          </Text>
-                        </View>
-                      </Pressable>
-                    ))}
+              <View style={styles.footer}>
+                <View style={styles.ratingContainer}>
+                  <AntDesign name="star" size={12} color="#ffd531" />
+                  <Text style={styles.ratingText}>{item.rating_average}</Text>
+                </View>
+                <View style={styles.favoriteContainer}>
+                  <AntDesign name="heart" size={12} color="#3c82f6" />
+                  <Text style={styles.favoriteText}>Yêu thích</Text>
                 </View>
               </View>
-            )
-          )}
-        </ScrollView>
 
-        {/* Navigation Arrows */}
-        {currentIndex > 0 && (
-          <TouchableOpacity style={styles.navButton} onPress={handlePrev}>
-            <MaterialIcons name="keyboard-arrow-left" size={24} color="#333" />
-          </TouchableOpacity>
-        )}
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>
+                  <Text style={styles.discountLabel}>Giảm</Text>
+                  <Text style={styles.discountValue}> 14%</Text>
+                </Text>
+              </View>
 
-        {currentIndex < Math.ceil(list.length / 2) - 1 && (
-          <TouchableOpacity
-            style={[styles.navButton, styles.navButtonRight]}
-            onPress={handleNext}
-          >
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="#333" />
-          </TouchableOpacity>
-        )}
+              <View style={styles.installmentBadge}>
+                <Text style={styles.installmentText}>
+                  <Text style={styles.installmentLabel}>Trả góp</Text>
+                  <Text style={styles.installmentValue}> 0%</Text>
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+        ))}
       </View>
     </View>
   );
@@ -283,19 +207,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#333",
   },
-  carouselContainer: {
-    position: "relative",
-  },
-  productGroup: {
-    width: screenWidth,
-    paddingHorizontal: 16,
-  },
-  productRow: {
+  productGrid: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
+    paddingHorizontal: 0,
+  },
+  productWrapper: {
+    width: "48%",
+    marginBottom: 12,
   },
   productItem: {
-    width: itemWidth,
+    width: "100%",
     backgroundColor: "white",
     borderRadius: 8,
     paddingVertical: 16,
@@ -394,7 +317,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -6,
     left: 8,
-    backgroundColor: "#d70119",
+    backgroundColor: "#d70019",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -427,29 +350,6 @@ const styles = StyleSheet.create({
   installmentValue: {
     fontSize: 12,
     fontWeight: "bold",
-  },
-  navButton: {
-    position: "absolute",
-    top: "50%",
-    left: 8,
-    backgroundColor: "white",
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  navButtonRight: {
-    left: undefined,
-    right: 8,
   },
   skeletonContainer: {
     flexDirection: "row",

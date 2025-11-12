@@ -122,10 +122,7 @@ const ProductHome = ({
         >
           {list.map((items, groupIndex) => (
             <View key={groupIndex} style={styles.productGroup}>
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.productList}
-              >
+              <View style={styles.productList}>
                 {items.map((item, index) => (
                   <Pressable
                     key={index}
@@ -204,7 +201,7 @@ const ProductHome = ({
                     </View>
                   </Pressable>
                 ))}
-              </ScrollView>
+              </View>
             </View>
           ))}
         </ScrollView>

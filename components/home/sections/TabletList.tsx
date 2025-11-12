@@ -3,6 +3,9 @@ import type { ProductProps } from "@/types/api";
 import { productApi } from "@/utils/api/product.api";
 import ProductNoSlice from "@/components/products/ProductNoSlice";
 
+// Category ID cho Máy tính bảng trong database
+const TABLET_CATEGORY_ID = 10;
+
 export default function TabletList() {
   const [dataProducts, setDataProducts] = React.useState<ProductProps[]>([]);
   const brand: { name: string }[] = [
@@ -14,9 +17,11 @@ export default function TabletList() {
 
   const fetchProducts = async () => {
     try {
-      const result = await productApi.getAll();
+      const result = await productApi.getByCategory(TABLET_CATEGORY_ID);
       if (Array.isArray(result.data)) setDataProducts(result.data);
-    } catch (e) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   React.useEffect(() => {

@@ -3,6 +3,9 @@ import type { ProductProps } from "@/types/api";
 import { productApi } from "@/utils/api/product.api";
 import ProductNoSlice from "@/components/products/ProductNoSlice";
 
+// Category ID cho Đồng hồ thông minh trong database
+const SMARTWATCH_CATEGORY_ID = 13;
+
 export default function ClockSmartList() {
   const [dataProducts, setDataProducts] = React.useState<ProductProps[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -15,10 +18,11 @@ export default function ClockSmartList() {
 
   const fetchProducts = async () => {
     try {
-      const result = await productApi.getAll();
+      const result = await productApi.getByCategory(SMARTWATCH_CATEGORY_ID);
       setLoading(false);
       if (Array.isArray(result.data)) setDataProducts(result.data);
-    } catch (e) {
+    } catch (error) {
+      console.log(error);
       setLoading(false);
     }
   };

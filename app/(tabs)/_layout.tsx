@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, router } from "expo-router";
 import React, { useRef, useState } from "react";
 
 import { HapticTab } from "@/components/haptic-tab";
@@ -6,18 +6,28 @@ import PriceAddress from "@/components/home/PriceAddress";
 import SvgLogo from "@/components/svg/SvgLogo";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, Image } from "react-native";
 import { Modal, Portal, TextInput } from "react-native-paper";
 
 export default function TabLayout() {
   const [visible, setVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const hideModal = () => setVisible(false);
   const inputRef = useRef(null);
   const { totalCart } = useCart();
+  const { user } = useAuth();
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}` as any);
+      setSearchQuery("");
+    }
+  };
 
   return (
     <>
@@ -41,11 +51,14 @@ export default function TabLayout() {
                   <TextInput
                     ref={inputRef}
                     mode="outlined"
-                    placeholder="Bạn muốn mu..."
+                    placeholder="Bạn muốn mua gì..."
                     style={{ height: 38, width: 160, fontSize: 12 }}
                     left={<TextInput.Icon icon="magnify" size={20} />}
                     autoCapitalize="none"
                     theme={{ roundness: 7 }}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={handleSearch}
                   />
                 </View>
                 <Pressable onPress={() => setVisible(!visible)}>
@@ -145,18 +158,35 @@ export default function TabLayout() {
           name="account"
           options={{
             title: "Tài khoản",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="account" size={24} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: "Cài đặt",
-            tabBarIcon: ({ color }) => (
-              <AntDesign name="setting" size={24} color={color} />
-            ),
+            tabBarIcon: ({ color }) => {
+              if (user?.avatar_url) {
+                return (
+                  <View
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 14,
+                      overflow: "hidden",
+                      borderWidth: 2,
+                      borderColor: color,
+                    }}
+                  >
+                    <Image
+                      source={{ uri: user.avatar_url }}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="cover"
+                    />
+                  </View>
+                );
+              }
+              return (
+                <MaterialCommunityIcons
+                  name="account"
+                  size={24}
+                  color={color}
+                />
+              );
+            },
           }}
         />
       </Tabs>

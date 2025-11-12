@@ -20,15 +20,16 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBarStyle("light-content");
-      StatusBar.setBackgroundColor("#d70119");
+      StatusBar.setBackgroundColor("#d70018");
     }, [])
   );
 
   return (
     <>
-      <StatusBar barStyle="light-content" />
-      <ScrollView className="bg-[#f5f5f5] flex gap-y-4 mt-4 px-4">
-        <View className="bg-white rounded-lg">
+      <StatusBar barStyle="light-content" backgroundColor="#d70018" />
+
+      <ScrollView className="bg-[#f5f5f5] flex gap-y-4 px-4">
+        <View className="bg-white rounded-lg mt-4">
           <OptionHome />
         </View>
         <CategoryHome />
