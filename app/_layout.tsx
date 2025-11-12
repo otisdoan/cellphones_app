@@ -13,6 +13,7 @@ import { ProfileProvider } from "@/context/ProfileContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -25,6 +26,7 @@ function RootLayoutInner() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
       </Stack>
+      <ChatWidget />
     </ThemeProvider>
   );
 }

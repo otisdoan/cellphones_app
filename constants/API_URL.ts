@@ -29,4 +29,11 @@ export const API_URL = {
   ORDER_ITEMS: "/order-items",
   CART_ITEM: "/cart-items",
   PAYMENT: "/payments/checkout",
+  CHAT: {
+    SEND_MESSAGE: "/api/chat/message",
+    GET_HISTORY: "/api/chat/history",
+    SUBMIT_FEEDBACK: "/api/chat/feedback",
+    END_SESSION: "/api/chat/session/end",
+    HEALTH_CHECK: "/api/chat/health",
+  },
 };
