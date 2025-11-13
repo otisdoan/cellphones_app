@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     }
   };
-
+// Login function to store user data and token
   const login = async (userData: UserProps, userToken: string) => {
     try {
       await Promise.all([
