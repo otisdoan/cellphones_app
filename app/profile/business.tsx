@@ -7,7 +7,6 @@ export default function BusinessPage() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView>
-        {/* Header */}
         <View className="bg-red-600 px-4 py-6">
           <View className="flex-row items-center gap-3">
             <TouchableOpacity onPress={() => router.back()}>
