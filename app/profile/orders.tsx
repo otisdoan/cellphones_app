@@ -81,7 +81,6 @@ export default function OrderHistory() {
 
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const onRefresh = async () => {
