@@ -15,6 +15,9 @@ import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 
+
+
+
 export const unstable_settings = {
   anchor: "(tabs)",
 };
