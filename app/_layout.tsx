@@ -1,4 +1,9 @@
-// import { useColorScheme } from "@/hooks/use-color-scheme";
+import { ChatWidget } from "@/components/chat/ChatWidget";
+import { AuthProvider } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
+import { OrderProvider } from "@/context/OrderContext";
+import { ProfileProvider } from "@/context/ProfileContext";
+import { ThemeProviderApp, useAppTheme } from "@/context/ThemeContext";
 import {
   DarkTheme,
   DefaultTheme,
@@ -8,15 +13,6 @@ import { Stack } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 import "../global.css";
-import { ThemeProviderApp, useAppTheme } from "@/context/ThemeContext";
-import { ProfileProvider } from "@/context/ProfileContext";
-import { AuthProvider } from "@/context/AuthContext";
-import { CartProvider } from "@/context/CartContext";
-import { OrderProvider } from "@/context/OrderContext";
-import { ChatWidget } from "@/components/chat/ChatWidget";
-
-
-
 
 export const unstable_settings = {
   anchor: "(tabs)",
