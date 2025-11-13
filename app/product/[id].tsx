@@ -1,26 +1,26 @@
+import LoginPromptModal from "@/components/modals/LoginPromptModal";
+import AttributeProduct from "@/components/products/AttributeProduct";
+import CarouselProduct from "@/components/products/CarouselProduct";
+import FavoriteProduct from "@/components/products/FavoriteProduct";
+import GiftProduct from "@/components/products/GiftProduct";
+import OptionProduct from "@/components/products/OptionProduct";
+import ProductCommitments from "@/components/products/ProductCommitments";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
+import type { ProductProps } from "@/types/api";
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
   ActivityIndicator,
   Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { productApi } from "../../utils/api/product.api";
-import type { ProductProps } from "@/types/api";
-import CarouselProduct from "@/components/products/CarouselProduct";
-import ProductCommitments from "@/components/products/ProductCommitments";
-import AttributeProduct from "@/components/products/AttributeProduct";
-import OptionProduct from "@/components/products/OptionProduct";
-import GiftProduct from "@/components/products/GiftProduct";
-import FavoriteProduct from "@/components/products/FavoriteProduct";
-import { useCart } from "@/context/CartContext";
-import { useAuth } from "@/context/AuthContext";
-import LoginPromptModal from "@/components/modals/LoginPromptModal";
 
 const ProductDetailScreen = () => {
   const { id } = useLocalSearchParams();
@@ -41,14 +41,12 @@ const ProductDetailScreen = () => {
       setLoading(true);
       console.log("🔍 Fetching product with ID:", id);
 
-      // Bước 1: Lấy product bằng id để có slug
       const resultById = await productApi.getById(Number(id));
 
       if (!Array.isArray(resultById.data) && resultById.data.slug) {
         const productSlug = resultById.data.slug;
         console.log("✅ Got product slug:", productSlug);
 
-        // Bước 2: Dùng slug để lấy product kèm product_image
         const resultBySlug = await productApi.getProductBySlug(
           `/${productSlug}`
         );
