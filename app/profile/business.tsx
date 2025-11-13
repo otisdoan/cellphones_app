@@ -7,7 +7,6 @@ export default function BusinessPage() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView>
-        {/* Header */}
         <View className="bg-red-600 px-4 py-6">
           <View className="flex-row items-center gap-3">
             <TouchableOpacity onPress={() => router.back()}>
@@ -20,7 +19,6 @@ export default function BusinessPage() {
         </View>
 
         <View className="p-4 space-y-4">
-          {/* Banner */}
           <View className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-blue-600 rounded-xl p-6">
             <Ionicons name="briefcase" size={48} color="white" />
             <Text className="text-white text-2xl font-bold mt-4 mb-2">
