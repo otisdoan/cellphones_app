@@ -50,7 +50,6 @@ export default function TermsPage() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView>
-        {/* Header */}
         <View className="bg-red-600 px-4 py-6">
           <View className="flex-row items-center gap-3">
             <TouchableOpacity onPress={() => router.back()}>
@@ -63,7 +62,6 @@ export default function TermsPage() {
         </View>
 
         <View className="p-4 space-y-4">
-          {/* Last Updated */}
           <View className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <View className="flex-row items-center gap-2">
               <Ionicons name="information-circle" size={20} color="#2563eb" />
@@ -73,7 +71,6 @@ export default function TermsPage() {
             </View>
           </View>
 
-          {/* Sections */}
           {sections.map((section, index) => (
             <View key={index} className="bg-white rounded-lg shadow-sm p-4">
               <Text className="text-base font-semibold text-gray-900 mb-2">
@@ -85,7 +82,6 @@ export default function TermsPage() {
             </View>
           ))}
 
-          {/* Contact */}
           <View className="bg-gray-100 rounded-lg p-4">
             <Text className="text-sm font-medium text-gray-900 mb-3">
               Liên hệ với chúng tôi
