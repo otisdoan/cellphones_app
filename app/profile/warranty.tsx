@@ -28,7 +28,6 @@ export default function WarrantyCheck() {
     if (!serial.trim()) return;
 
     setLoading(true);
-    // Simulate API call
     setTimeout(() => {
       setResult({
         serial: serial,
@@ -57,7 +56,6 @@ export default function WarrantyCheck() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView>
-        {/* Header */}
         <View className="bg-red-600 px-4 py-6">
           <View className="flex-row items-center gap-3">
             <TouchableOpacity onPress={() => router.back()}>
@@ -70,14 +68,12 @@ export default function WarrantyCheck() {
         </View>
 
         <View className="p-4 space-y-4">
-          {/* Info Card */}
           <View className="bg-white rounded-lg shadow-sm p-4">
             <Text className="text-sm text-gray-600">
               Nhập số Serial/IMEI để kiểm tra thông tin bảo hành sản phẩm
             </Text>
           </View>
 
-          {/* Search Form */}
           <View className="bg-white rounded-lg shadow-sm p-4">
             <Text className="text-sm font-medium text-gray-700 mb-2">
               Số Serial/IMEI <Text className="text-red-500">*</Text>
@@ -106,7 +102,6 @@ export default function WarrantyCheck() {
             </TouchableOpacity>
           </View>
 
-          {/* Result */}
           {result && (
             <View className="bg-white rounded-lg shadow-sm p-4">
               <Text className="text-lg font-semibold text-gray-900 mb-4">

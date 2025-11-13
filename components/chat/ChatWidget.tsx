@@ -21,8 +21,7 @@ export const ChatWidget: React.FC = () => {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  // Pulse animation for floating button
+  // useEffect for pulsing animation
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
