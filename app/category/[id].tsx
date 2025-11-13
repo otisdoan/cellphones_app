@@ -21,7 +21,7 @@ type PriceRange = {
   max: number;
 };
 
-// Category name mapping
+
 const CATEGORY_NAMES: Record<number, string> = {
   1: "Điện thoại",
   3: "Laptop",
